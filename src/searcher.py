@@ -280,8 +280,22 @@ def getPosts(args):
         except Forbidden:
             raise InsufficientPermission("You do not have permission to do that")
 
+    elif "commented" in args:
+        print (
+            "commented posts of {user}\nlimit: {limit}\n".format(
+                user=args["user"],
+                limit=args["limit"]
+            ).upper(),noPrint=True
+        )
+        try:
+            comments = reddit.redditor(args["user"]).comments.new(limit=args["limit"])
+            return redditSearcher(
+                (comment.submission for comment in comments)
+            )
+        except Forbidden:
+            raise InsufficientPermission("You do not have permission to do that")
+
     elif "post" in args:
-        print("post: {post}\n".format(post=args["post"]).upper(),noPrint=True)
         return redditSearcher(
             reddit.submission(url=args["post"]),SINGLE_POST=True
         )

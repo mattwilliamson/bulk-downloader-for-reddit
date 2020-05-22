@@ -114,6 +114,10 @@ def parseArguments(arguments=[]):
                         action="store_true",
                         help="Gets upvoted posts of --user")
 
+    parser.add_argument("--commented",
+                        action="store_true",
+                        help="Gets commented posts of --user")
+
     parser.add_argument("--log",
                         help="Takes a log file which created by itself " \
                              "(json files), reads posts and tries downloadin" \
@@ -187,7 +191,7 @@ def checkConflicts():
     search = 1 if GLOBAL.arguments.search else 0
 
     modes = [
-        "saved","subreddit","submitted","log","link","upvoted","multireddit"
+        "saved","subreddit","submitted","log","link","upvoted","multireddit","commented"
     ]
 
     values = {
@@ -209,10 +213,16 @@ def checkConflicts():
     if search+values["upvoted"] == 2:
         raise SearchModeError("You cannot search in upvoted posts")
 
+    if search+values["commented"] == 2:
+        raise SearchModeError("You cannot search in upvoted posts")
+
     if search+values["log"] == 2:
         raise SearchModeError("You cannot search in log files")
 
     if values["upvoted"]+values["submitted"] == 1 and user == 0:
+        raise RedditorNameError("No redditor name given")
+
+    if values["commented"]+values["submitted"] == 1 and user == 0:
         raise RedditorNameError("No redditor name given")
 
 class PromptUser:
@@ -241,7 +251,7 @@ class PromptUser:
         print("select program mode:")
         programModes = [
             "search","subreddit","multireddit",
-            "submitted","upvoted","saved","log"
+            "submitted","upvoted","saved","log","commented"
         ]
         programMode = self.chooseFrom(programModes)
 
@@ -345,6 +355,10 @@ class PromptUser:
         elif programMode == "upvoted":
             GLOBAL.arguments.upvoted = True
             GLOBAL.arguments.user = input("\nredditor: ")
+
+        elif programMode == "commented":
+            GLOBAL.arguments.commented = True
+            GLOBAL.arguments.user = input("\nredditor: ")
         
         elif programMode == "saved":
             GLOBAL.arguments.saved = True
@@ -418,6 +432,9 @@ def prepareAttributes():
 
     elif GLOBAL.arguments.upvoted is True:
         ATTRIBUTES["upvoted"] = True
+
+    elif GLOBAL.arguments.commented is True:
+        ATTRIBUTES["commented"] = True
 
     elif GLOBAL.arguments.submitted is not None:
         ATTRIBUTES["submitted"] = True
