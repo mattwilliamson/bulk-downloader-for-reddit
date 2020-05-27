@@ -452,17 +452,13 @@ class Gfycat:
 
         soup = BeautifulSoup(pageSource, "html.parser")
         attributes = {"data-react-helmet":"true","type":"application/ld+json"}
-        content = soup.find("script",attrs=attributes)
+        content = soup.find("meta",attrs={"property": "og:video"})
 
         if content is None:
-            try:
-                content = soup.find("meta",attrs={"property": "og:video"})
-                return content["content"]
-            except:
-                print("Error parsing: {}".format(pageSource))
-                raise NotADownloadableLinkError("Could not read the page source (parse) {}".format(url))
+            print("Error parsing: {}".format(pageSource))
+            raise NotADownloadableLinkError("Could not read the page source (parse) {}".format(url))
 
-        return json.loads(content.text)["video"]["contentUrl"]
+        return content["content"]
 
 class Direct:
     def __init__(self,directory,POST):
