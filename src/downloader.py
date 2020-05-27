@@ -405,7 +405,7 @@ class Gfycat:
         try:
             POST['mediaURL'] = self.getLink(POST['postURL'])
         except IndexError:
-            raise NotADownloadableLinkError("Could not read the page source")
+            raise NotADownloadableLinkError("Could not read the page source {}".format(POST))
         except Exception as exception:
             #debug
             raise exception
@@ -455,7 +455,12 @@ class Gfycat:
         content = soup.find("script",attrs=attributes)
 
         if content is None:
-            raise NotADownloadableLinkError("Could not read the page source")
+            try:
+                content = soup.find("meta",attrs={"property": "og:video"})
+                return content["content"]
+            except:
+                print("Error parsing: {}".format(pageSource))
+                raise NotADownloadableLinkError("Could not read the page source (parse) {}".format(url))
 
         return json.loads(content.text)["video"]["contentUrl"]
 
